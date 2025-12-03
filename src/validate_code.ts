@@ -112,6 +112,20 @@ export function validateCode(code: string): ValidationResult {
         }
       }
 
+      // Block while and do-while loops to prevent infinite loops that block the thread
+      // For loops are allowed as they have more structure and termination conditions
+      if (node.type === "WhileStatement") {
+        errors.push(
+          "while loops are not allowed (potential infinite loop). Use for loops or array methods instead."
+        );
+      }
+
+      if (node.type === "DoWhileStatement") {
+        errors.push(
+          "do-while loops are not allowed (potential infinite loop). Use for loops or array methods instead."
+        );
+      }
+
       // Check for identifiers that aren't in our allowed list or defined locally
       if (node.type === "Identifier" && !ALLOWED_GLOBALS.has(node.name)) {
         // Only flag it if it's being used as a free variable (not a property, parameter, or declaration)

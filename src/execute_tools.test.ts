@@ -280,6 +280,81 @@ describe('executeTools with AST validation', () => {
     });
   });
 
+  describe('infinite loop prevention', () => {
+    it('should block while loops', async () => {
+      const code = `
+        let counter = 0;
+        while(true) {
+          counter++;
+        }
+        return counter;
+      `;
+
+      const result = await executeTools(code, mockTools);
+
+      expect(result.output).toContain('Code validation failed');
+      expect(result.output).toContain('while loops are not allowed');
+    });
+
+    it('should block do-while loops', async () => {
+      const code = `
+        let i = 0;
+        do {
+          i++;
+        } while(i < 10);
+        return i;
+      `;
+
+      const result = await executeTools(code, mockTools);
+
+      expect(result.output).toContain('Code validation failed');
+      expect(result.output).toContain('do-while loops are not allowed');
+    });
+
+    it('should allow for loops', async () => {
+      const code = `
+        let sum = 0;
+        for(let i = 0; i < 5; i++) {
+          sum += i;
+        }
+        return sum;
+      `;
+
+      const result = await executeTools(code, mockTools);
+
+      expect(result.output).toBe('10');
+    });
+
+    it('should allow array iteration methods', async () => {
+      const code = `
+        const numbers = [1, 2, 3, 4, 5];
+        const doubled = numbers.map(n => n * 2);
+        return doubled;
+      `;
+
+      const result = await executeTools(code, mockTools);
+
+      // JSON.stringify formats with line breaks, so just check the values are there
+      expect(result.output).toContain('2');
+      expect(result.output).toContain('10');
+    });
+
+    it('should allow for-of loops', async () => {
+      const code = `
+        const items = ['a', 'b', 'c'];
+        let result = '';
+        for(const item of items) {
+          result += item;
+        }
+        return result;
+      `;
+
+      const result = await executeTools(code, mockTools);
+
+      expect(result.output).toBe('abc');
+    });
+  });
+
   describe('sneaky attempts to bypass validation', () => {
     it('should block indirect access via this keyword tricks', async () => {
       const code = `
