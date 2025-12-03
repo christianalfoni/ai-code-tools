@@ -1,0 +1,47 @@
+{
+  "name": "ai-code-tools",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "npm run build && tsx test.ts",
+    "test:unit": "vitest"
+  },
+  "keywords": [
+    "ai",
+    "llm",
+    "tools",
+    "vercel-ai-sdk",
+    "ai-sdk",
+    "code-execution",
+    "tool-discovery"
+  ],
+  "author": "",
+  "license": "MIT",
+  "description": "Wrap your AI SDK tools with code execution capabilities - discover and execute multiple tools in a single step",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/ai-code-tools.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "zod": "^3.0.0"
+  },
+  "peerDependencies": {
+    "ai": "^4.0.0 || ^5.0.0"
+  },
+  "devDependencies": {
+    "@ai-sdk/anthropic": "^2.0.53",
+    "@types/acorn": "^4.0.6",
+    "@types/node": "^24.10.1",
+    "acorn": "^8.15.0",
+    "ai": "^5.0.106",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.15",
+    "zod": "^4.1.13"
+  }
+}
