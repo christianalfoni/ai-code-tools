@@ -213,6 +213,73 @@ describe('executeTools with AST validation', () => {
     });
   });
 
+  describe('toString() attacks to expose implementation', () => {
+    it('should not expose tool implementation via toString()', async () => {
+      // Create a tool with sensitive information in its implementation
+      const sensitiveTools = {
+        apiCall: {
+          execute: async (endpoint: string) => {
+            const API_KEY = 'secret-key-12345';
+            const INTERNAL_URL = 'https://internal.api.company.com';
+            // Simulate API call with sensitive data
+            return `Called ${INTERNAL_URL}${endpoint} with key ${API_KEY}`;
+          }
+        }
+      };
+
+      const code = `
+        // Try to extract the implementation
+        const impl = tools.apiCall.toString();
+        return impl;
+      `;
+
+      const result = await executeTools(code, sensitiveTools);
+
+      // Should NOT contain the sensitive information
+      expect(result.output).not.toContain('secret-key-12345');
+      expect(result.output).not.toContain('internal.api.company.com');
+      expect(result.output).not.toContain('API_KEY');
+
+      // Should only show the wrapper function
+      expect(result.output).toContain('async');
+      expect(result.output).toContain('...');
+    });
+
+    it('should not expose implementation via tools.name.execute.toString()', async () => {
+      const sensitiveTools = {
+        deleteUser: {
+          execute: async (userId: string) => {
+            const ADMIN_TOKEN = 'admin-secret-token';
+            // Sensitive deletion logic
+            return `Deleted user ${userId} using ${ADMIN_TOKEN}`;
+          }
+        }
+      };
+
+      const code = `
+        const impl = tools.deleteUser.execute.toString();
+        return impl;
+      `;
+
+      const result = await executeTools(code, sensitiveTools);
+
+      expect(result.output).not.toContain('admin-secret-token');
+      expect(result.output).not.toContain('ADMIN_TOKEN');
+    });
+
+    it('should still allow normal toString() on other objects', async () => {
+      const code = `
+        const obj = { name: 'test', value: 42 };
+        return obj.toString();
+      `;
+
+      const result = await executeTools(code, mockTools);
+
+      // Normal toString should work fine
+      expect(result.output).toBe('[object Object]');
+    });
+  });
+
   describe('sneaky attempts to bypass validation', () => {
     it('should block indirect access via this keyword tricks', async () => {
       const code = `

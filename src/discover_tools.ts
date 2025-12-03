@@ -35,8 +35,7 @@ export function discoverToolsInMemory(
     }
 
     return { tools: matchedTools };
-  } catch (error) {
-    console.error("Error discovering tools:", error);
+  } catch {
     return { tools: [] };
   }
 }
