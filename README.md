@@ -4,7 +4,7 @@ Supercharge your AI SDK tools with code execution capabilities. Discover and exe
 
 ## What is this?
 
-AI Code Tools wraps your existing Vercel AI SDK tools and adds two powerful meta-tools:
+AI Code Tools wraps your existing Vercel AI SDK / Tanstack AI tools and adds two powerful meta-tools:
 
 1. **`discover_tools`** - Let the LLM search through available tools by name and schema
 2. **`execute_tools`** - Let the LLM write JavaScript code to orchestrate multiple tool calls in one step
